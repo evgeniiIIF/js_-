@@ -328,6 +328,16 @@ for (let key in user) {
   alert( user[key] ); // John, 30, true
 }
 -----------------------
+Проверка обьекта на пустоту
+Просто в цикле перебираем свойства объекта и возвращаем false, как только встречаем свойство./
+function isEmpty(obj) {
+  for (let key in obj) {
+    // если тело цикла начнет выполняться - значит в объекте есть свойства
+    return false;
+  }
+  return true;
+}
+-----------------------
 Упорядочевание свойств
 свойства с целочисленными ключами сортируются по возрастанию, остальные располагаются в порядке создания.
 https://learn.javascript.ru/object#uporyadochenie-svoystv-obekta
@@ -388,7 +398,186 @@ let user = {
 user.sayHi(); // Джон
 -----------------------
 Конструкторы, создание объектов через "new"
+Функции-конструкторы являются обычными функциями. Но есть два соглашения:
+
+Имя функции-конструктора должно начинаться с большой буквы.
+Функция-конструктор должна вызываться при помощи оператора "new".
+
+function User(name) {
+  this.name = name;
+  this.isAdmin = false;
+}
+
+let user = new User("Вася");
+
+alert(user.name); // Вася
+alert(user.isAdmin); // fals
+_______________
+ели есть return
+
+function BigUser() {
+  this.name = "Вася";
+  return { name: "Godzilla" };  // <-- возвращает этот объект
+}
+alert( new BigUser().name );  // Godzilla, получили этот объект
+
+А вот пример с пустым return (или мы могли бы поставить примитив после return, неважно)
+function SmallUser() {
+  this.name = "Вася";
+  return; // <-- возвращает this
+}
+alert( new SmallUser().name );  // Вася
+_______________
+Создание методов в конструкторе
+function User(name) {
+  this.name = name;
+
+  this.sayHi = function() {
+    alert( "Меня зовут: " + this.name );
+  };
+}
+
+let vasya = new User("Вася");
+
+vasya.sayHi(); // Меня зовут: Вася
+
+/*
+vasya = {
+   name: "Вася",
+   sayHi: function() { ... }
+}
+*/
 -----------------------
+Символы
+// Создаём символ id с описанием (именем) "id"
+let id = Symbol("id");
+
+Если же мы действительно хотим вывести символ с помощью alert, 
+то необходимо явно преобразовать его с помощью метода .toString(), вот так:
+
+let id = Symbol("id");
+alert(id.toString()); // Symbol(id), теперь работает
+Или мы можем обратиться к свойству symbol.description, чтобы вывести только описание:
+
+let id = Symbol("id");
+alert(id.description); // id
+_______________________
+Мы хотим добавить к ним идентификаторы.
+Используем для этого символьный ключ:
+
+let user = {
+  name: "Вася"
+};
+
+let id = Symbol("id");
+
+user[id] = 1;
+
+alert( user[id] ); // мы можем получить доступ к данным по ключу-символу
+_____________________
+Символы в литеральном объекте
+Если мы хотим использовать символ при литеральном объявлении объекта {...}, его необходимо заключить в квадратные скобки.
+let id = Symbol("id");
+
+let user = {
+  name: "Вася",
+  [id]: 123 // просто "id: 123" не сработает
+};
+___________
+Символы игнорируются циклом for…in
+А вот Object.assign, в отличие от цикла for..in, копирует и строковые, и символьные свойства:
+__________
+Одинаковые символы
+// читаем символ из глобального реестра и записываем его в переменную
+let id = Symbol.for("id"); // если символа не существует, он будет создан
+
+// читаем его снова в другую переменную (возможно, из другого места кода)
+let idAgain = Symbol.for("id");
+
+// проверяем -- это один и тот же символ
+alert( id === idAgain ); // true
+_____________
+// получаем символ по имени
+let sym = Symbol.for("name");
+let sym2 = Symbol.for("id");
+
+// получаем имя по символу
+alert( Symbol.keyFor(sym) ); // name
+alert( Symbol.keyFor(sym2) ); // id
+______________
+Впрочем, для любых символов доступно свойство description.
+
+let globalSymbol = Symbol.for("name");
+let localSymbol = Symbol("name");
+
+alert( Symbol.keyFor(globalSymbol) ); // name, глобальный символ
+alert( Symbol.keyFor(localSymbol) ); // undefined для неглобального символа
+
+alert( localSymbol.description ); // name
+-----------------------
+Преобразование объектов в примитивы
+https://learn.javascript.ru/object-toprimitive
+
+записать метод в обьект.
+obj[Symbol.toPrimitive] = function(hint) {
+  // должен вернуть примитивное значение
+  // hint равно чему-то одному из: "string", "number" или "default"
+};
+______________
+let user = {
+  name: "John",
+  money: 1000,
+
+  [Symbol.toPrimitive](hint) {
+    alert(`hint: ${hint}`);
+    return hint == "string" ? `{name: "${this.name}"}` : this.money;
+  }
+};
+
+// демонстрация результатов преобразований:
+alert(user); // hint: string -> {name: "John"}
+alert(+user); // hint: number -> 1000
+alert(user + 500); // hint: default -> 1500
+_____________
+Методы toString и valueOf берут своё начало с древних времён. Они не символы, так как в то время символов ещё не существовало, а просто обычные методы объектов со строковыми именами. Они предоставляют «устаревший» способ реализации преобразований объектов.
+
+Если нет метода Symbol.toPrimitive, движок JavaScript пытается найти эти методы и вызвать их следующим образом:
+
+toString -> valueOf для хинта со значением «string».
+valueOf -> toString – в ином случае.
+Для примера, используем их в реализации всё того же объекта user. Воспроизведём его поведение комбинацией методов toString и valueOf:
+
+let user = {
+  name: "John",
+  money: 1000,
+
+  // для хинта равного "string"
+  toString() {
+    return `{name: "${this.name}"}`;
+  },
+
+  // для хинта равного "number" или "default"
+  valueOf() {
+    return this.money;
+  }
+
+};
+
+alert(user); // toString -> {name: "John"}
+alert(+user); // valueOf -> 1000
+alert(user + 500); // valueOf -> 1500
+___________
+let user = {
+  name: "John",
+
+  toString() {
+    return this.name;
+  }
+};
+
+alert(user); // toString -> John
+alert(user + 500); // toString -> John500
+
 -----------------------
 -----------------------
 -----------------------
