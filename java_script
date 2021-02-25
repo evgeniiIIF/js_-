@@ -828,7 +828,7 @@ alert( "Midget".includes("id", 3) ); // false, поиск начат с пози
 alert( "Widget".startsWith("Wid") ); // true, "Wid" — начало "Widget"
 alert( "Widget".endsWith("get") ); // true, "get" — окончание "Widget"
 ----------строки-------------
-Получение подстроки
+Получение подстроки. Получить подстроку
 В JavaScript есть 3 метода для получения подстроки: substring, substr и slice.
 
 slice(start, end)	от start до end (не включая end)	можно передавать отрицательные значения
@@ -918,7 +918,7 @@ alert( str );
 // ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
 // ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜ
 -----------------------
-str.trim() — убирать пробелы в начале и конце строки.
+str.trim() — удаляет пробелы в начале и конце строки.
 str.repeat(n) — повторить строку n раз.
 -----------------------
 -----------------------
