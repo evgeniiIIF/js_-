@@ -740,8 +740,8 @@ for (let char of "Hello") {
 Изменение регистра
 Методы toLowerCase() и toUpperCase() меняют регистр символов:
 
-alert( 'Interface'.toUpperCase() ); // INTERFACE
-alert( 'Interface'.toLowerCase() ); // interface
+alert( 'Interface'.toUpperCase() ); // INTERFACE - верхний регистр
+alert( 'Interface'.toLowerCase() ); // interface - нижний регистр
 Если мы захотим перевести в нижний регистр какой-то конкретный символ:
 
 alert( 'Interface'[0].toLowerCase() ); // 'i'
