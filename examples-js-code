@@ -1,0 +1,62 @@
+____________________________________Методы массивов_____________________________________
+
+------arr.filter()--------Фильтрация по диапазону
+
+let array = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+
+function rangeArr(arr, a,b) {
+  return arr.filter( item => (item >= a && item <= b) );
+}
+
+let a = rangeArr(array, 4,8)
+
+console.log(a) // [4, 5, 6, 7, 8]
+
+------arr.filter()--------Фильтрация по диапазону на месте
+
+let array = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+
+function rangeArr(arr, a,b) {
+  for ( let i = 0; i < arr.length; i++ ) {
+    let vel = arr[i];
+    
+    if ( vel < a || vel > b ) {
+      arr.splice( i, 1 );
+      i--;
+    }
+  }
+}
+
+rangeArr(array, 4, 9);
+
+console.log(array) // [4, 5, 6, 7, 8, 9]
+
+------arr.map()--------Вид строки
+
+let str = "background-color";
+
+function camelize(str) {
+  return str
+    .split('-')
+    .map( (item, index) => (index == 0) ? item: item[0].toUpperCase() + item.slice(1)  )
+    .join("")
+  
+}
+
+let a = camelize(str);
+
+console.log(a);
+
+------arr.sort()--------Сортировка массива по убыванию
+
+let arr = [5, 2, 1, -10, 8];
+
+function sortArr(arr) {
+  arr
+    .sort( (a, b) => a - b )
+    .reverse()
+}
+
+sortArr(arr)
+console.log(arr)
+
