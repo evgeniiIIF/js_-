@@ -1319,8 +1319,71 @@ let soldiers = users.filter(army.canJoin, army);
 // console.log(soldiers.length); // 2
 console.log(soldiers[0].age); // 1
 console.log(soldiers[1].age); // 3
+_____________________________________________________________Перебираемые объекты___________________________________________________________________________
+https://learn.javascript.ru/iterable#array-from
+Symbol.iterator
+
+let range = {
+  from: 1,
+  to: 5,
+  [Symbol.iterator]: function(){
+    return  {
+      current: this.from,
+      last: this.to,
+      
+      next() {
+        if (this.current <= this.last) {
+          return {done: false, value: this.current++};
+        }else {
+          return {done: true};
+        }
+      }
+    }
+  }
+};
+
+// for(key of range) {
+//   console.log(key);
+// }
+
+
+let a = range[Symbol.iterator]();
+
+console.log(a.next());
 -----------------------
+Итератор строк
+
+let str = "Hello";
+
+// делает то же самое, что и
+// for (let char of str) alert(char);
+
+let iterator = str[Symbol.iterator]();
+
+while (true) {
+  let result = iterator.next();
+  if (result.done) break;
+  alert(result.value); // выводит символы один за другим
+}
 -----------------------
+Итерируемые объекты и псевдомассивы
+Итерируемые объекты – это объекты, которые реализуют метод Symbol.iterator, как было описано выше.
+Псевдомассивы – это объекты, у которых есть индексы и свойство length, то есть, они выглядят как массивы.
+Array.from - Перевести в массив.
+
+et arrayLike = {
+  0: "Hello",
+  1: "World",
+  length: 2
+};
+
+let arr = Array.from(arrayLike); // (*)
+alert(arr.pop()); // World (метод работает)
+--------------------------
+// range взят из примера выше
+let arr = Array.from(range);
+alert(arr); // 1,2,3,4,5 (преобразование массива через toString работает)
+---------------------------
 
 _____________________________________________________________Структура кода___________________________________________________________________________
 _____________________________________________________________Структура кода___________________________________________________________________________
