@@ -1374,7 +1374,7 @@ while (true) {
 Псевдомассивы – это объекты, у которых есть индексы и свойство length, то есть, они выглядят как массивы.
 Array.from - Перевести в массив______.
 
-et arrayLike = {
+let arrayLike = {
   0: "Hello",
   1: "World",
   length: 2
@@ -1600,8 +1600,43 @@ Set имеет те же встроенные методы, что и Map:
 set.values() – возвращает перебираемый объект для значений,
 set.keys() – то же самое, что и set.values(), присутствует для обратной совместимости с Map,
 set.entries() – возвращает перебираемый объект для пар вида [значение, значение], присутствует для обратной совместимости с Map.
+--------------------------------------Изменить структуру---------------------------------
+Obj to Arr
+let obj = {
+  name: "jon",
+  subname: "Smit",
+  age: 18,
+};
+
+let arr = Object.keys(obj); // ["name", "subname", "age"]
+let arr = Object.values(obj); // ["jon", "Smit", 18]
+let arr = Object.entries(obj); // [["name", "jon"], ["subname", "Smit"], ["age", 18]]
 --------------
+Obj to Map
+let map = new Map(Object.entries(obj));//Array.from(map) // [["name", "jon"], ["subname", "Smit"], ["age", 18]]
 --------------
+Map to Obj
+let obj = Object.fromEntries(map.entries());
+--------------
+Map to Arr
+Array.from( map.values() )// ["jon", "Smit", 18]
+Array.from( map.keys() )// ["name", "subname", "age"]
+Array.from( map.entries() )// [["name", "jon"], ["subname", "Smit"], ["age", 18]]
+-------------
+Arr to Obj
+obj2 = Object.fromEntries(arr) // {age: 18, name: "jon", subname: "Smit"};
+-------------
+Arr to Map
+let map2 = new Map(arr) // arr должен иметь вид [["name", "jon"], ["subname", "Smit"], ["age", 18]];
+----
+let map2 = new Map( arr.entries() );//[[0, ["name", "jon"]], [1, ["subname", "Smit"]], [2, ["age", 18]]]
+
+
+
+
+
+
+
 
 
 _____________________________________________________________Структура кода___________________________________________________________________________
