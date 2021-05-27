@@ -130,6 +130,18 @@ console.log(a.next());
 console.log(a.next());
 console.log(a.next());
 console.log(a.next());
+____________________________Числа фебоначи___________________________
+function feb(n) {
+  let a = 0, b = 1, arr;
+  n > 0 ? arr = [a,b]: arr = [a];
+  for (let i = 2; i <= n; i++ ) {
+    [a,b] = [b, a + b];
+    arr.push(b);
+  }
+  return arr
+}
+
+console.log(feb(1))
 
 
 
