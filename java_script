@@ -1624,6 +1624,7 @@ Array.from( map.keys() )// ["name", "subname", "age"]
 Array.from( map.entries() )// [["name", "jon"], ["subname", "Smit"], ["age", 18]]
 -------------
 Arr to Obj
+let arr = [["name", "jon"], ["subname", "Smit"], ["age", 18]]
 obj2 = Object.fromEntries(arr) // {age: 18, name: "jon", subname: "Smit"};
 -------------
 Arr to Map
