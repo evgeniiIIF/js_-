@@ -7,7 +7,14 @@ let array = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 function rangeArr(arr, a,b) {
   return arr.filter( item => (item >= a && item <= b) );
 }
+let obj = {
+  name: 'Jon',
+  surname: 'Smith',
+  age: 22
+};
 
+let obj2 = Object.fromEntries(Object.values(obj).map((item, index) => [index, item]) )
+console.log(obj2)
 let a = rangeArr(array, 4,8)
 
 console.log(a) // [4, 5, 6, 7, 8]
@@ -143,7 +150,15 @@ function feb(n) {
 
 console.log(feb(1))
 
+__________________Из обьекта в псевдомассив___________________
+let obj = {
+  name: 'Jon',
+  surname: 'Smith',
+  age: 22
+};
 
+let obj2 = Object.fromEntries(Object.values(obj).map((item, index) => [index, item]) )
+console.log(obj2)
 
 
 
