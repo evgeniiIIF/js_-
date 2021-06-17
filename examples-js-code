@@ -158,6 +158,7 @@ let obj = {
 };
 
 let obj2 = Object.fromEntries(Object.values(obj).map((item, index) => [index, item]) )
+obj.length = Object.keys(obj).length
 console.log(obj2)
 
 
