@@ -161,7 +161,35 @@ let obj2 = Object.fromEntries(Object.values(obj).map((item, index) => [index, it
 obj.length = Object.keys(obj).length
 console.log(obj2)
 
+_____________[Symbol.species]__________свойство! вызов без()в концу [Symbol.species]_________
+class Bakery {
+  constructor() {
+    this.name = "anomimus bakery";
+    this.packed = false;
+  }
+  byEat() {console.log("You can eat")};
+  static get [Symbol.species](){return Pie}
+}
 
+class Pie extends Bakery {
+  constructor(){
+    super();
+    this.name = 'pie'
+  }
+}
+
+class PackedBakery extends Bakery {
+  constructor(){
+    super();
+    let derivedClass = Bakery[Symbol.species];
+    let product = new derivedClass();
+    product.packed = true;
+    return product
+  }
+}
+
+let PacBac = new PackedBakery();
+console.log(PacBac)
 
 
 
