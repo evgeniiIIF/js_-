@@ -190,7 +190,19 @@ class PackedBakery extends Bakery {
 
 let PacBac = new PackedBakery();
 console.log(PacBac)
+__________________________Расширение встроенных классов___________
+class Test extends Object {
+  constructor(options){
+    super()
+    this.name = options.name;
+    this.surname = options.surname;
+  }
+  
+  print(){                        \\добавляем новый метод для обьектов нетрогая глобальный прототип//
+    console.log(this)
+  }
+}
 
-
-
-
+let test = new Test({name:"jon", surname: 'smit'});
+test.print()
+_______________________________________________________________
