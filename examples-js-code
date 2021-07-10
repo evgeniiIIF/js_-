@@ -205,4 +205,36 @@ class Test extends Object {
 
 let test = new Test({name:"jon", surname: 'smit'});
 test.print()
-_______________________________________________________________
+
+________________________Примеси_______________________________________
+let obj = {
+  on(eventName, handler) {
+    if(!this._eventHandlers) this._eventHandlers = {};
+    if(!this._eventHandlers[eventName]) this._eventHandlers[eventName] = [];
+    this._eventHandlers[eventName].push(handler);
+  },
+  off(eventName, handler) {
+    let handlers = this._eventHandlers && this._eventHandlers[eventName];
+    if(!handlers) return;
+    for (let i = 0; i < handlers.length; i++){
+      console.log(i)
+      if(handlers[i].name == handler) {handlers.splice(i, 1);console.log(i)};
+    }
+  },
+  triger(eventName, ...args) {
+    if(!this._eventHandlers || !this._eventHandlers[eventName]) return;
+    this._eventHandlers[eventName].forEach(item => item.apply(this, args))
+  }
+}
+obj.on("sayHi", function one(name) {console.log("hello one " + name )});
+obj.on("sayHi", two = function() {console.log("hello two")})
+obj.on("sayHi", sex = () => {console.log("hello sex")})
+
+class Test {
+  print(...args) {
+    this.triger.apply(this, args)
+  }
+}
+Object.assign(Test.prototype, obj);
+let test = new Test();
+test.print('sayHi', 'jon')
