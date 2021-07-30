@@ -269,4 +269,27 @@ function go(){
     .then(div => {div.classList.add('message-ball');
                   div.append("Hello world"); return div})
     .then(div => {div.classList.add('message-ball');div.append(" Hell")})
+------круг замыкание iffi---------
+new Promise(resolve => {
+  let div = document.createElement('div');
+  div.className = "circle";
+  document.body.append(div);
+  resolve(div);
+})
+.then(function f(div) {
+    let i = 0
+    div.append(i)
+  
+return (function ff(){  return new Promise(resolve => {
+    let arr = ['blue', 'yellow', 'black'];
+    if(i >= arr.length) i = 0;
+    setTimeout(() => {
+      div.style.backgroundColor = arr[i];
+      resolve(div);
+      i += 1;
+      ff(div)
+      console.log(i)
+    }, 1000)
+  })})()
+})
   
