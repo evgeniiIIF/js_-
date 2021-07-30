@@ -238,3 +238,35 @@ class Test {
 Object.assign(Test.prototype, obj);
 let test = new Test();
 test.print('sayHi', 'jon')
+_______________________Всплывающий круг___________________________
+let button = document.getElementById("button"); showCircle = showCircle();
+button.addEventListener("click", () => go());
+function showCircle() {
+  let c = 0;
+  return function(radius) {
+    c += 100
+    let div = document.createElement("div");
+    div.style.width = '10px';
+    div.style.height = '10px';
+    div.style.left = c + 'px';
+    div.style.top = 150 + 'px';
+    div.className = "circle";
+    document.body.append(div);
+    return new Promise( resolve => {
+      setTimeout(() => {
+        div.style.width = radius * 2 + 'px';
+        div.style.height = radius * 2 + 'px';
+        div.addEventListener("transitionend", function han(){
+          div.removeEventListener('transitionend', han);
+          resolve(div)
+        })
+      }, 10)
+    })
+  }
+}
+function go(){
+  showCircle(100)
+    .then(div => {div.classList.add('message-ball');
+                  div.append("Hello world"); return div})
+    .then(div => {div.classList.add('message-ball');div.append(" Hell")})
+  
