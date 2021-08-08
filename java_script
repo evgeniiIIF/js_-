@@ -4560,6 +4560,110 @@ https://learn.javascript.ru/custom-errors#obyortyvanie-isklyucheniy
 исключение вместо разных низкоуровневых. 
 Иногда низкоуровневые исключения становятся свойствами этого объекта, как err.cause в примерах выше, но это не обязательно.
 ---------------------
+_____________________________________________________Введение: колбэки_______________________________________________________
+Подход, который мы использовали в loadScript, также распространён и называется «колбэк с первым аргументом-ошибкой» («error-first callback»).
+
+1.Первый аргумент функции callback зарезервирован для ошибки. В этом случае вызов выглядит вот так: callback(err).
+2.Второй и последующие аргументы — для результатов выполнения. В этом случае вызов выглядит вот так: callback(null, result1, result2…).
+Одна и та же функция callback используется и для информирования об ошибке, и для передачи результатов.
+
+function loadScript(src, callback){
+  let script = document.createElement('script');
+  script.src = src;
+  script.onload = () => callback(null, script);
+  script.onerror = () => callback(new Error("Err my"), script)
+  document.head.append(script)
+}
+
+function f(err, script){
+  if(err) console.log(err.message)
+  else console.log("Great is loaded script " + script.src)
+}
+
+loadScript('https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.2.0/lodash.j', f )
+-----------------
+_________________________________________________Промисы___________________________________________________________
+Promise – это специальный объект в JavaScript, который связывает «создающий» и «потребляющий» коды вместе. 
+«Создающий» код может выполняться сколько потребуется, а «Потребляющий» код будет ждать результат 
+(несмотря на асинхронность движок не пойдет дальше по коду, а будет ждать ответа промиса).
+----
+let promise = new Promise(function(resolve, reject) {
+  
+  // функция-исполнитель (executor)
+  // запускается автоматически
+  
+  if(true) resolve("done")
+  else reject(new Error("Err"))
+  
+})
+.then(value => console.log(value), err => console.log(err.message)) //"done" - обрабатывает первой функцией resolve а второй reject.
+или...
+.then(value => console.log(value)) - Можно писать только одну первую если обрабатываем только resolve
+-----
+.catch(err => console.log(err.message)
+
+Если мы хотели бы только обработать ошибку, то можно использовать null в качестве первого аргумента: .then(null, errorHandlingFunction). 
+Или можно воспользоваться методом .catch(errorHandlingFunction), который сделает тоже самое:
+-----
+.finally(() => alert("Промис завершён")) - Вызов .finally(f) f выполнится в любом случае, когда промис завершится: успешно или с ошибкой.
+.then(result => alert(result)); // <-- .then обработает результат
+finally не предназначен для обработки результата промиса. Так что он просто пропускает его через себя дальше к последующим обработчикам.
+----------------
+Функция, переданная в конструкцию new Promise, называется исполнитель (executor). Когда Promise создаётся, она запускается автоматически. 
+Она должна содержать «создающий» код, который когда-нибудь создаст результат. 
+
+resolve(value) — если работа завершилась успешно, с результатом value.
+reject(error) — если произошла ошибка, error – объект ошибки.
+-----
+Итак, исполнитель запускается автоматически, он должен выполнить работу, а затем вызвать resolve или reject.
+У объекта promise, возвращаемого конструктором new Promise, есть внутренние свойства:
+
+state  
+(«состояние») — вначале "pending" («ожидание»), 
+далее...
+при вызове resolve меняется на "fulfilled" («выполнено успешно») 
+при вызове reject меняется на "rejected" («выполнено с ошибкой») 
+
+result 
+(«результат») — вначале undefined
+далее...    
+при вызове resolve(value) изменяется на value
+при вызове reject(error) изменится на error
+
+Свойства state и result – это внутренние свойства объекта Promise и мы не имеем к ним прямого доступа.
+-------------
+Может быть что-то одно: либо результат, либо ошибка
+
+let promise = new Promise(function(resolve, reject) {
+  resolve("done");
+
+  reject(new Error("…")); // игнорируется
+  setTimeout(() => resolve("…")); // игнорируется
+});
+--------------
+loadScript на промисах (loadScript on promises)
+
+function loadScript(src){
+  return new Promise(function(resolve, reject) {
+    let script = document.createElement('script');
+    script.src = src;
+    script.onload = () => resolve(script);
+    script.onerror = () => reject(new Error("Err my"))
+    document.head.append(script)
+  })
+}
+
+let promise = loadScript('https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.2.0/lodash.js' )
+
+promise.then(
+  value => console.log(value.src),
+  err => console.log(err.message)
+);
+
+promise.then(value => console.log('one more handler'))
+--------------
+
+____________________________________________________________________________________________________________
 ____________________________________________________________________________________________________________
 
 -------------
