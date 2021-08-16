@@ -293,3 +293,22 @@ return (function ff(){  return new Promise(resolve => {
   })})()
 })
   
+----------------сумма с произвольным колличеством скобок------------тема Объект функции, NFE----
+function func(a) {
+
+  let currentSum = a;
+
+  function f(b) {
+    currentSum += b;
+    return f;
+  }
+
+  f.toString = function() {
+    return currentSum.toString();
+  };
+
+  return f;
+}
+
+console.log(func(1)(2)(3))
+
