@@ -5316,7 +5316,7 @@ let results = await Promise.all([
 Вызовanm async–функцию из "обычной"
 
 async function wait() {
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, 1000));          - __дождаться__
 
   return 10;
 }
@@ -5375,17 +5375,215 @@ __________________________________________________Навигация по DOM-э
 <html> = document.documentElement
 Самый верхний узел документа: document.documentElement. В DOM он соответствует тегу <html>.
 -------------
-<body> = document.body
-Другой часто используемый DOM-узел – узел тега <body>: document.body.
--------------
 <head> = document.head
 Тег <head> доступен как document.head.
 -------------
-Если скрипт находится в <head>, document.body в нём недоступен, потому что браузер его ещё не прочитал.
+<body> = document.body
+Другой часто используемый DOM-узел – узел тега <body>: document.body.
 -------------
+Если скрипт находится в <head>, document.body в нём недоступен, потому что браузер его ещё не прочитал. body == null
+=============
+
+childNodes - это коллекция которая содержит список всех детей, 
+включая текстовые узлы, для выбранного элемента head,body,html итд
+--
+
+for (let i = 0; i < document.body.childNodes.length; i++) {
+      console.log( document.body.childNodes[i] ); // Text, DIV, Text, UL, ..., SCRIPT
+    }
+--
+
+Для перебора коллекции мы можем использовать for..of:
+
+for (let node of document.body.childNodes) {
+  alert(node); // покажет все узлы из коллекции
+}
+--
+
+Из childNodes можно создать массив
+
+console.log( Array.from(document.body.childNodes).filter ); // сделали массив чтобы применять методы массивов
 -------------
+
+firstChild - быстрый доступ к первому дочернему элементу.  == elem.childNodes[0] === elem.firstChild
+lastChild -быстрый доступ к последнему дочернему элементу. == elem.childNodes[elem.childNodes.length - 1] === elem.lastChild
+-------------
+
+nextSibling - cледующий узел того же родителя (следующий сосед)  == document.head.nextSibling  // HTMLBodyElement
+previousSibling - предыдущий узел того же родителя (следующий сосед) == document.body.previousSibling ); // HTMLHeadElement
+-------------
+
+parentNode - родитель узла => document.body.parentNode // <html>
+-------------
+
+________________________________________________Навигация только по элементам____________________________________________________
+
+Навигационные свойства, описанные выше, относятся ко всем узлам в документе. 
+В частности, в childNodes находятся и текстовые узлы и узлы-элементы и узлы-комментарии, если они есть.
+
+Но для большинства задач текстовые узлы и узлы-комментарии нам не нужны. 
+Мы хотим манипулировать узлами-элементами, которые представляют собой теги и формируют структуру страницы.
+-------------
+Эти ссылки похожи на те, что раньше, только в ряде мест стоит слово Element:
+
+children – коллекция детей, которые являются элементами.
+firstElementChild, lastElementChild – первый и последний дочерний элемент.
+previousElementSibling, nextElementSibling – соседи-элементы.
+parentElement – родитель-элемент.
+-------------
+while(elem = elem.parentElement) { // идти наверх до <html>
+  alert( elem );
+}
+-------------
+Теперь цикл выводит только элементы:
+
+for (let elem of document.body.children) {
+  alert(elem); // DIV, UL, DIV, SCRIPT
+}
+-------------
+Элемент <table>, в дополнение к свойствам, о которых речь шла выше, поддерживает следующие:
+
+table.rows – коллекция строк <tr> таблицы.
+table.caption/tHead/tFoot – ссылки на элементы таблицы <caption>, <thead>, <tfoot>.
+table.tBodies – коллекция элементов таблицы <tbody> (по спецификации их может быть больше одного).
+<thead>, <tfoot>, <tbody> предоставляют свойство rows:
+
+tbody.rows – коллекция строк <tr> секции.
+<tr>:
+
+tr.cells – коллекция <td> и <th> ячеек, находящихся внутри строки <tr>.
+tr.sectionRowIndex – номер строки <tr> в текущей секции <thead>/<tbody>/<tfoot>.
+tr.rowIndex – номер строки <tr> в таблице (включая все строки таблицы).
+<td> and <th>:
+
+td.cellIndex – номер ячейки в строке <tr>.
+--
+
+Пример использования:
+
+<table id="table">
+  <tr>
+    <td>один</td><td>два</td>
+  </tr>
+  <tr>
+    <td>три</td><td>четыре</td>
+  </tr>
+</table>
+
+
+// выводит содержимое первой строки, второй ячейки
+console.log( table.rows[0].cells[1].innerHTML ) // "два"
+-------------
+
+________________________________________________Поиск: getElement*, querySelector*______________________________________________
+-------------
+document.getElementById(id)
+
+Если у элемента есть атрибут id, то мы можем получить его , где бы он ни находился.
+Значение id должно быть уникальным. Только document.getElementById
+Метод getElementById можно вызвать только для объекта document. Он осуществляет поиск по id по всему документу
+-------------
+elem.querySelectorAll(css)
+
+возвращает все элементы внутри elem, удовлетворяющие данному CSS-селектору.
+Пример поиска по таблице
+--
+let elements = document.querySelectorAll('tr:nth-child(1) > td:first-child')
+
+for(let elem of elements) {
+    console.log(elem.innerHTML)
+}
+--
+Псевдоклассы тоже работают
+Псевдоклассы в CSS-селекторе, в частности :hover и :active, также поддерживаются. 
+Например, document.querySelectorAll(':hover') вернёт коллекцию (в порядке вложенности:
+от внешнего к внутреннему) из текущих элементов под курсором мыши.
+-------------
+querySelector
+
+Метод elem.querySelector(css) возвращает первый элемент, соответствующий данному CSS-селектору.
+Иначе говоря, результат такой же, как при вызове elem.querySelectorAll(css)[0], но он сначала найдёт все элементы,
+а потом возьмёт первый, в то время как elem.querySelector найдёт только первый и остановится. Это быстрее
+-------------
+matches
+
+Предыдущие методы искали по DOM.
+Метод elem.matches(css) ничего не ищет, а проверяет, 
+удовлетворяет ли elem CSS-селектору, и возвращает true или false.
+
+Этот метод удобен, когда мы перебираем элементы (например, в массиве или в чём-то подобном) 
+и пытаемся выбрать те из них, которые нас интересуют.
+
+Например:
+
+<a href="http://example.com/file.zip">...</a>
+<a href="http://ya.ru">...</a>
+
+<script>
+  // может быть любая коллекция вместо document.body.children
+  for (let elem of document.body.children) {
+    if (elem.matches('a[href$="zip"]')) {
+      alert("Ссылка на архив: " + elem.href );
+    }
+  }
+</script>
+-------------
+closest
+
+Предки элемента – родитель, родитель родителя, его родитель и так далее. 
+Вместе они образуют цепочку иерархии от элемента до вершины.
+
+Метод elem.closest(css) ищет ближайшего предка, который соответствует CSS-селектору.
+ Сам элемент также включается в поиск.
+
+Другими словами, метод closest поднимается вверх от элемента и проверяет каждого из родителей. 
+Если он соответствует селектору, поиск прекращается. 
+Метод возвращает либо предка, либо null, если такой элемент не найден.
+
+Например:
+
+<h1>Содержание</h1>
+
+<div class="contents">
+  <ul class="book">
+    <li class="chapter">Глава 1</li>
+    <li class="chapter">Глава 2</li>
+  </ul>
+</div>
+
+<script>
+  let chapter = document.querySelector('.chapter'); // LI
+
+  alert(chapter.closest('.book')); // UL
+  alert(chapter.closest('.contents')); // DIV
+
+  alert(chapter.closest('h1')); // null (потому что h1 - не предок)
+</script>
+-------------
+Можете встретить их в старом коде.
+https://learn.javascript.ru/searching-elements-dom#getelementsby
+--
+elem.getElementsByTagName(tag) 
+ищет элементы с данным тегом и возвращает их коллекцию. 
+Передав "*" вместо тега, можно получить всех потомков.
+--
+elem.getElementsByClassName(className) 
+возвращает элементы, которые имеют данный CSS-класс.
+--
+document.getElementsByName(name) 
+возвращает элементы с заданным атрибутом name. Очень редко используется.
+-------------
+
+Метод			Ищет по...	Ищет внутри элемента?	Возвращает живую коллекцию?
+querySelectorAll	CSS-selector		✔			-
+querySelector		CSS-selector		✔			-
+getElementById		id			-			-
+getElementsByName	name			-			✔
+getElementsByTagName	tag or '*'		✔			✔
+getElementsByClassName	class			✔			✔
+-------------
+
 ____________________________________________________________________________________________________________________________________
-____________________________________________________________________________________________________________________________________
-____________________________________________________________________________________________________________________________________
+
 ____________________________________________________________________________________________________________________________________
 
