@@ -5405,7 +5405,7 @@ for (let node of document.body.childNodes) {
 console.log( Array.from(document.body.childNodes).filter ); // сделали массив чтобы применять методы массивов
 -------------
 
-firstChild - быстрый доступ к первому дочернему элементу.  == elem.childNodes[0] === elem.firstChild
+firstChild - быстрый доступ к первому дочернему элементу.  == elem.childNodes[0]                          === elem.firstChild
 lastChild -быстрый доступ к последнему дочернему элементу. == elem.childNodes[elem.childNodes.length - 1] === elem.lastChild
 -------------
 
@@ -5482,6 +5482,9 @@ document.getElementById(id)
 Если у элемента есть атрибут id, то мы можем получить его , где бы он ни находился.
 Значение id должно быть уникальным. Только document.getElementById
 Метод getElementById можно вызвать только для объекта document. Он осуществляет поиск по id по всему документу
+
+let elem = document.getElementById('elem');
+
 -------------
 elem.querySelectorAll(css)
 
@@ -5582,8 +5585,586 @@ getElementsByName	name			-			✔
 getElementsByTagName	tag or '*'		✔			✔
 getElementsByClassName	class			✔			✔
 -------------
+Пример навигации
 
-____________________________________________________________________________________________________________________________________
+// 1. Таблица с `id="age-table"`.
+let table = document.getElementById('age-table')
 
+// 2. Все label в этой таблице
+table.getElementsByTagName('label')
+// или
+document.querySelectorAll('#age-table label')
+
+// 3. Первый td в этой таблице
+table.rows[0].cells[0]
+// или
+table.getElementsByTagName('td')[0]
+// или
+table.querySelector('td')
+
+// 4. Форма с name="search"
+// предполагаем, что есть только один элемент с таким name в документе
+let form = document.getElementsByName('search')[0]
+// или, именно форма:
+document.querySelector('form[name="search"]')
+
+// 5. Первый input в этой форме
+form.getElementsByTagName('input')[0]
+// или
+form.querySelector('input')
+
+// 6. Последний input в этой форме
+let inputs = form.querySelectorAll('input') // найти все input
+inputs[inputs.length-1] // взять последний
+
+___________________________________________Свойства узлов: тип, тег и содержимое____________________________________________
+
+Существуют следующие классы:
+
+EventTarget – это корневой «абстрактный» класс. Объекты этого класса никогда не создаются. Он служит основой, 
+благодаря которой все DOM-узлы поддерживают так называемые «события», о которых мы поговорим позже.
+
+Node – также является «абстрактным» классом, и служит основой для DOM-узлов. Он обеспечивает базовую функциональность: 
+parentNode, nextSibling, childNodes и т.д. (это геттеры). Объекты класса Node никогда не создаются. 
+Но есть определённые классы узлов, которые наследуют от него: Text – для текстовых узлов, 
+Element – для узлов-элементов и более экзотический Comment – для узлов-комментариев.
+
+Element – это базовый класс для DOM-элементов. Он обеспечивает навигацию на уровне элементов: nextElementSibling,
+children и методы поиска: getElementsByTagName, querySelector. Браузер поддерживает не только HTML, 
+но также XML и SVG. Класс Element служит базой для следующих классов: SVGElement, XMLElement и HTMLElement.
+
+HTMLElement – является базовым классом для всех остальных HTML-элементов. От него наследуют конкретные элементы:
+HTMLInputElement – класс для тега <input>,
+HTMLBodyElement – класс для тега <body>,
+HTMLAnchorElement – класс для тега <a>,
+…и т.д, каждому тегу соответствует свой класс, который предоставляет определённые свойства и методы.
+---------------------
+
+Для того, чтобы узнать имя класса DOM-узла, вспомним, что обычно у объекта есть свойство constructor.
+Оно ссылается на конструктор класса, и в свойстве constructor.name содержится его имя:
+
+alert( document.body.constructor.name ); // HTMLBodyElement
+
+…Или мы можем просто привести его к строке:
+
+alert( document.body ); // [object HTMLBodyElement]
+---------------------
+
+tagName есть только у элементов Element. alert( document.body.nodeName ); // BODY
+
+nodeName определено для любых узлов Node: alert( document.body.tagName ); // BODY
+для элементов оно равно tagName.
+для остальных типов узлов (текст, комментарий и т.д.) оно содержит строку с типом узла.
+---------------------
+
+innerHTML позволяет получить HTML-содержимое элемента в виде строки. Можем изменять его "=" или добавлять "+="
+
+innerHTML+= делает следующее: Перезаписывает: Лучше не применять. почитать ссылку. Есть другой способ добавления
+https://learn.javascript.ru/basic-dom-node-properties#budte-vnimatelny-innerhtml-osuschestvlyaet-perezapis
+
+1.Старое содержимое удаляется.
+2.На его место становится новое значение innerHTML (с добавленной строкой).
+---------------------
+
+outerHTML содержит HTML элемента целиком. Это как innerHTML плюс сам элемент.
+При замене заменяет тег эллемента.
+---
+<div>Привет, мир!</div>
+
+  let div = document.querySelector('div');
+  // заменяем div.outerHTML на <p>...</p>
+  div.outerHTML = '<p>Новый элемент</p>'; // (*)
+
+  // Ранее полученное одержимое div.outerHTML сохраняется!
+  alert(div.outerHTML); // <div>Привет, мир!</div> (**)
+---
+Мы можем получить ссылки на новые элементы, обратившись к DOM.
+---------------------
+nodeValue и data похожи - для чтения содержимого текстового узла и комментариев
+---------------------
+textContent предоставляет доступ к тексту внутри элемента за вычетом всех <тегов>.
+
+ let name = prompt("Введите ваше имя?", "<b>Винни-пух!</b>");
+
+  elem1.innerHTML = name;// Винни-пух! с применение тега <b>
+  elem2.textContent = name;// <b>Винни-пух!</b>  вставиться как строка
+
+textContent – один из способов от этого защититься от вставки в код лишнего HTML.
+---------------------
+
+Атрибут и DOM-свойство «hidden» указывает на то, видим ли мы элемент или нет.
+Мы можем использовать его в HTML или назначать при помощи JavaScript, как в примере ниже:
+---
+<div>Оба тега DIV внизу невидимы</div>
+
+<div hidden>С атрибутом "hidden"</div>
+
+<div id="elem">С назначенным JavaScript свойством "hidden"</div>
+
+<script>
+  elem.hidden = true;
+</script>
+---
+Технически, hidden работает так же, как style="display:none". Но его применение проще.
+Мигающий элемент:
+
+<div id="elem">Мигающий элемент</div>
+
+<script>
+  setInterval(() => elem.hidden = !elem.hidden, 1000); 
+</script>
+
+====
+let elem = true
+setInterval(() =>  console.log(elem = !elem), 1000)// false true false true false
+====
+---------------------
+Другие свойства
+У DOM-элементов есть дополнительные свойства, в частности, зависящие от класса:
+
+value – значение для <input>, <select> и <textarea> (HTMLInputElement, HTMLSelectElement…).
+href – адрес ссылки «href» для <a href="..."> (HTMLAnchorElement).
+id – значение атрибута «id» для всех элементов (HTMLElement).
+…и многие другие…
+Например:
+
+<input type="text" id="elem" value="значение">
+
+<script>
+  alert(elem.type); // "text"
+  alert(elem.id); // "elem"
+  alert(elem.value); // значение
+</script>
+
+Большинство стандартных HTML-атрибутов имеют соответствующее DOM-свойство, и мы можем получить к нему доступ.
+
+Если мы хотим узнать полный список поддерживаемых свойств для данного класса, можно найти их в спецификации. 
+Например, класс HTMLInputElement описывается здесь: https://html.spec.whatwg.org/#htmlinputelement.
+
+Если же нам нужно быстро что-либо узнать или нас интересует специфика определённого браузера – мы всегда 
+можем вывести элемент в консоль, используя console.dir(elem), и прочитать все свойства. 
+Или исследовать «свойства DOM» во вкладке Elements браузерных инструментов разработчика.
+
+
+___________________________________________________Атрибуты и свойства____________________________________________________
+
+Атрибуты – это то, что написано в HTML.
+Свойства – это то, что находится в DOM-объектах.
+---
+Методы для работы с атрибутами:
+
+elem.hasAttribute(name) – проверить на наличие.
+elem.getAttribute(name) – получить значение.
+elem.setAttribute(name, value) – установить значение.
+elem.removeAttribute(name) – удалить атрибут.
+elem.attributes – это коллекция всех атрибутов.
+---
+В большинстве ситуаций предпочтительнее использовать DOM-свойства. Нужно использовать атрибуты только тогда, 
+когда DOM-свойства не подходят, когда нужны именно атрибуты, например:
+
+Нужен нестандартный атрибут. Но если он начинается с data-, тогда нужно использовать dataset.
+Мы хотим получить именно то значение, которое написано в HTML. Значение DOM-свойства может быть другим, 
+например, свойство href – всегда полный URL, а нам может понадобиться получить «оригинальное» значение.
+--------------
+
+Например, для такого тега <body id="page"> у DOM-объекта будет такое свойство body.id="page".
+Но преобразование атрибута в свойство происходит не один-в-один!
+--------------
+
+DOM-свойства
+Ранее мы уже видели встроенные DOM-свойства. Их много. Но технически нас никто не ограничивает, 
+и если этого мало – мы можем добавить своё собственное свойство.
+
+DOM-узлы – это обычные объекты JavaScript. Мы можем их изменять.
+Например, создадим новое свойство для document.body:
+--
+document.body.myData = {
+  name: 'Caesar',
+  title: 'Imperator'
+};
+
+alert(document.body.myData.title); // Imperator
+
+Мы можем добавить и метод:
+
+document.body.sayTagName = function() {
+  alert(this.tagName);
+};
+
+document.body.sayTagName(); // BODY (значением "this" в этом методе будет document.body)
+---
+Также можно изменять встроенные прототипы, такие как Element.prototype и добавлять новые методы ко всем элементам:
+
+Element.prototype.sayHi = function() {
+  alert(`Hello, I'm ${this.tagName}`);
+};
+
+document.documentElement.sayHi(); // Hello, I'm HTML
+document.body.sayHi(); // Hello, I'm BODY
+
+Итак, DOM-свойства и методы ведут себя так же, как и обычные объекты JavaScript:
+Им можно присвоить любое значение.
+Они регистрозависимы (нужно писать elem.nodeType, не elem.NoDeTyPe).
+---------------------
+
+HTML-атрибуты
+В HTML у тегов могут быть атрибуты. Когда браузер парсит HTML, чтобы создать DOM-объекты для тегов, 
+он распознаёт стандартные атрибуты и создаёт DOM-свойства для них. Нестандартрые можно получить с помощью:
+Все атрибуты доступны с помощью следующих методов:
+
+elem.hasAttribute(name) – проверяет наличие атрибута.
+elem.getAttribute(name) – получает значение атрибута.
+elem.setAttribute(name, value) – устанавливает значение атрибута.
+elem.removeAttribute(name) – удаляет атрибут.
+
+Эти методы работают именно с тем, что написано в HTML.
+---------------------
+Кроме этого, получить все атрибуты элемента можно с помощью свойства elem.attributes: коллекция объектов, 
+которая принадлежит ко встроенному классу Attr со свойствами name и value.
+У HTML-атрибутов есть следующие особенности:
+
+Их имена регистронезависимы (id то же самое, что и ID).
+Их значения всегда являются строками.
+--
+<body>
+  <div id="elem" about="Elephant"></div>
+
+  <script>
+    alert( elem.getAttribute('About') ); // (1) 'Elephant', чтение
+
+    elem.setAttribute('Test', 123); // (2), запись
+
+    alert( elem.outerHTML ); // (3),   <div id="elem" about="Elephant" test="123"></div>
+
+
+    for (let attr of elem.attributes) { // (4) весь список
+      alert( `${attr.name} = ${attr.value}` );
+    }
+  </script>
+</body>
+---------------------
+
+Синхронизация между атрибутами и свойствами
+https://learn.javascript.ru/dom-attributes-and-properties#sinhronizatsiya-mezhdu-atributami-i-svoystvami
+---------------------
+DOM-свойства типизированы
+DOM-свойства не всегда являются строками. Например, свойство input.checked (для чекбоксов) имеет логический тип:
+
+<input id="input" type="checkbox" checked> checkbox
+
+<script>
+  alert(input.getAttribute('checked')); // значение атрибута: пустая строка
+  alert(input.checked); // значение свойства: true
+</script>
+--
+Есть и другие примеры. Атрибут style – строка, но свойство style является объектом:
+
+<div id="div" style="color:red;font-size:120%">Hello</div>
+
+<script>
+  // строка
+  alert(div.getAttribute('style')); // color:red;font-size:120%
+
+  // объект
+  alert(div.style); // [object CSSStyleDeclaration]
+  alert(div.style.color); // red
+</script>
+
+Хотя большинство свойств, всё же, строки.
+
+При этом некоторые из них, хоть и строки, могут отличаться от атрибутов. Например, DOM-свойство href всегда содержит 
+полный URL, даже если атрибут содержит относительный URL или просто #hash
+
+Если же нужно значение href или любого другого атрибута в точности, 
+как оно записано в HTML, можно воспользоваться getAttribute.
+---------------------
+
+Все атрибуты, начинающиеся с префикса «data-», зарезервированы для использования программистами. Они доступны в свойстве dataset.
+Например, если у elem есть атрибут "data-about", то обратиться к нему можно как elem.dataset.about.
+
+<body data-about="Elephants">
+<script>
+  alert(document.body.dataset.about); // Elephants
+</script>
+--
+Атрибуты, состоящие из нескольких слов, к примеру data-order-state, 
+становятся свойствами, записанными с помощью верблюжьей нотации: dataset.orderState.
+
+<style>
+ .order[data-order-state="canceled"] {
+    color: red;
+  }
+</style>
+
+<div id="order" class="order" data-order-state="new">A new order.</div>
+
+<script>
+  // чтение
+  alert(order.dataset.orderState); // new
+
+  // изменение
+  order.dataset.orderState = "pending"; // (*)
+  // или
+  order.setAttribute('data-order-state', 'red')
+</script>
+______________________________________________________Изменение документа____________________________________________________
+Создание элемента
+
+DOM-узел можно создать двумя методами:
+
+document.createElement(tag)
+Создаёт новый элемент с заданным тегом:
+--
+let div = document.createElement('div');
+document.createTextNode(text)
+--
+Создаёт новый текстовый узел с заданным текстом:
+let textNode = document.createTextNode('А вот и я');
+------------
+Создание сообщения
+В нашем случае сообщение – это div с классом alert и HTML в нём:
+
+let div = document.createElement('div');
+div.className = "alert";
+div.innerHTML = "<strong>Всем привет!</strong> Вы прочитали важное сообщение.";
+------------
+методы для различных вариантов вставки:
+
+node.append(...nodes or strings) – добавляет узлы или строки в конец node,
+node.prepend(...nodes or strings) – вставляет узлы или строки в начало node,
+node.before(...nodes or strings) – вставляет узлы или строки до node,
+node.after(...nodes or strings) – вставляет узлы или строки после node,
+node.replaceWith(...nodes or strings) – заменяет node заданными узлами или строками.
+--
+<ol id="ol">
+  <li>0</li>
+  <li>1</li>
+  <li>2</li>
+</ol>
+
+<script>
+  ol.before('before'); // вставить строку "before" перед <ol>
+  ol.after('after'); // вставить строку "after" после <ol>
+
+  let liFirst = document.createElement('li');
+  liFirst.innerHTML = 'prepend';
+  ol.prepend(liFirst); // вставить liFirst в начало <ol>
+
+  let liLast = document.createElement('li');
+  liLast.innerHTML = 'append';
+  ol.append(liLast); // вставить liLast в конец <ol>
+</script>
+
+--результат--
+
+before
+prepend
+0
+1
+2
+append
+after
+--
+
+Итоговый список будет таким:
+
+before
+<ol id="ol">
+  <li>prepend</li>
+  <li>0</li>
+  <li>1</li>
+  <li>2</li>
+  <li>append</li>
+</ol>
+after
+------------
+
+Эти методы могут вставлять несколько узлов и текстовых фрагментов за один вызов.
+Например, здесь вставляется строка и элемент:
+
+<div id="div"></div>
+<script>
+  div.before('<p>Привет</p>', document.createElement('hr'));
+</script>
+
+Строки вставляются безопасным способом, как делает это elem.textContent.
+Поэтому эти методы могут использоваться только для вставки DOM-узлов или текстовых фрагментов.
+------------
+Если мы хотим вставить HTML именно «как html», со всеми тегами и прочим
+insertAdjacentHTML /Text /Element
+
+elem.insertAdjacentHTML(where, html)
+
+where – это специальное слово, указывающее, куда по отношению к elem производить вставку. 
+Значение должно быть одним из следующих:
+
+"beforebegin" – вставить html непосредственно перед elem,
+"afterbegin" – вставить html в начало elem,
+"beforeend" – вставить html в конец elem,
+"afterend" – вставить html непосредственно после elem.
+--
+Второй параметр – это HTML-строка, которая будет вставлена именно «как HTML».
+--
+<div id="div"></div>
+<script>
+  div.insertAdjacentHTML('beforebegin', '<p>Привет</p>');
+  div.insertAdjacentHTML('afterend', '<p>Пока</p>');
+</script>
+
+…Приведёт к:
+
+<p>Привет</p>
+<div id="div"></div>
+<p>Пока</p>
+--
+У метода есть два брата:
+
+elem.insertAdjacentText(where, text) – такой же синтаксис, но строка text вставляется «как текст», вместо HTML,
+elem.insertAdjacentElement(where, elem) – такой же синтаксис, но вставляет элемент elem.
+
+Они существуют, в основном, чтобы унифицировать синтаксис. На практике часто используется только insertAdjacentHTML
+------------
+Удаление узлов
+Для удаления узла есть методы node.remove().
+
+Например, сделаем так, чтобы наше сообщение удалялось через секунду:
+
+<style>
+.alert {
+  padding: 15px;
+  border: 1px solid #d6e9c6;
+  border-radius: 4px;
+  color: #3c763d;
+  background-color: #dff0d8;
+}
+</style>
+
+<script>
+  let div = document.createElement('div');
+  div.className = "alert";
+  div.innerHTML = "<strong>Всем привет!</strong> Вы прочитали важное сообщение.";
+
+  document.body.append(div);
+  setTimeout(() => div.remove(), 1000);
+</script>
+------------
+Переместить элемент в другое место – нет необходимости удалять его со старого.
+Все методы вставки автоматически удаляют узлы со старых мест.
+
+Например, давайте поменяем местами элементы:
+
+<div id="first">Первый</div>
+<div id="second">Второй</div>
+<script>
+  // нет необходимости вызывать метод remove
+  second.after(first); // берёт #second и после него вставляет #first
+</script>
+------------
+Клонирование узлов: cloneNode
+Как вставить ещё одно подобное сообщение?
+
+Мы могли бы создать функцию и поместить код туда. Альтернатива – клонировать 
+существующий div и изменить текст внутри него (при необходимости).
+
+Вызов elem.cloneNode(true) создаёт «глубокий» клон элемента – со всеми атрибутами и дочерними элементами.
+Если мы вызовем elem.cloneNode(false), тогда клон будет без дочерних элементов.
+Пример копирования сообщения:
+
+<div class="alert" id="div">
+  <strong>Всем привет!</strong> Вы прочитали важное сообщение.
+</div>
+
+<script>
+  let div2 = div.cloneNode(true); // клонировать сообщение
+  div2.querySelector('strong').innerHTML = 'Всем пока!'; // изменить клонированный элемент
+
+  div.after(div2); // показать клонированный элемент после существующего div
+</script>
+--------------
+DocumentFragment
+
+DocumentFragment является специальным DOM-узлом, который служит обёрткой для передачи списков узлов.
+Мы можем добавить к нему другие узлы, но когда мы вставляем его куда-то, он «исчезает», вместо него вставляется его содержимое.
+Например, getListContent ниже генерирует фрагмент с элементами <li>, которые позже вставляются в <ul>:
+
+<ul id="ul"></ul>
+
+<script>
+function getListContent() {
+  let fragment = new DocumentFragment();
+
+  for(let i=1; i<=3; i++) {
+    let li = document.createElement('li');
+    li.append(i);
+    fragment.append(li);
+  }
+
+  return fragment;
+}
+
+ul.append(getListContent()); // (*)
+</script>
+
+Обратите внимание, что на последней строке с (*) мы добавляем DocumentFragment, но он «исчезает», поэтому структура будет:
+
+<ul>
+  <li>1</li>
+  <li>2</li>
+  <li>3</li>
+</ul>
+---
+
+DocumentFragment редко используется. Зачем добавлять элементы в специальный вид узла, 
+если вместо этого мы можем вернуть массив узлов? Переписанный пример:
+
+<ul id="ul"></ul>
+
+<script>
+function getListContent() {
+  let result = [];
+
+  for(let i=1; i<=3; i++) {
+    let li = document.createElement('li');
+    li.append(i);
+    result.push(li);
+  }
+
+  return result;
+}
+
+ul.append(...getListContent()); // append + оператор "..." = друзья!
+</script>
+----------------
+Устаревшие методы вставки/удаления
+https://learn.javascript.ru/modifying-document#ustarevshie-metody-vstavki-udaleniya
+
+parentElem.appendChild(node)
+Добавляет node в конец дочерних элементов parentElem.
+
+parentElem.insertBefore(node, nextSibling)
+Вставляет node перед nextSibling в parentElem.
+
+parentElem.replaceChild(node, oldChild)
+Заменяет oldChild на node среди дочерних элементов parentElem.
+
+parentElem.removeChild(node)
+Удаляет node из parentElem (предполагается, что он родитель node).
+----------------
+Несколько слов о «document.write»
+https://learn.javascript.ru/modifying-document#neskolko-slov-o-document-write
+
+Вызов document.write(html) записывает html на страницу «прямо здесь и сейчас».
+Вызов document.write работает только во время загрузки страницы.
+Если вызвать его позже, то существующее содержимое документа затрётся.
+--
+<p>Через одну секунду содержимое этой страницы будет заменено...</p>
+<script>
+  // document.write через 1 секунду
+  // вызов происходит после того, как страница загрузится, поэтому метод затирает содержимое
+  setTimeout(() => document.write('<b>...Этим.</b>'), 1000);
+</script>
 ____________________________________________________________________________________________________________________________________
+____________________________________________________________________________________________________________________________________
+____________________________________________________________________________________________________________________________________
+-
 
