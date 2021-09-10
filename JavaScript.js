@@ -6203,7 +6203,129 @@ function createTreeDom(obj) {
 }
 
 createTreeDom(data)
-____________________________________________________________________________________________________________________________________
+
+_____________________________________________________Стили и классы______________________________________________________
+
+elem.className соответствует атрибуту "class".
+Если мы присваиваем что-то elem.className, то это заменяет всю строку с классами.
+
+<body class="main page">
+  <script>
+    alert(document.body.className); // main page
+  </script>
+</body>
+--------------------
+
+elem.classList – это специальный объект с методами для добавления/удаления одного класса.
+
+<body class="main page">
+  <script>
+    // добавление класса
+    document.body.classList.add('article');
+    alert(document.body.className); // main page article
+  </script>
+</body>
+---
+Методы classList:
+
+elem.classList.add/remove("class") – добавить/удалить класс.
+elem.classList.toggle("class") – добавить класс, если его нет, иначе удалить.
+elem.classList.contains("class") – проверка наличия класса, возвращает true/false.
+--
+Кроме того, classList является перебираемым, поэтому можно перечислить все классы при помощи for..of:
+
+<body class="main page">
+  <script>
+    for (let name of document.body.classList) {
+      alert(name); // main, затем page
+    }
+  </script>
+</body>
+--------------------
+
+elem.style – это объект, который соответствует тому, что написано в атрибуте "style". 
+Установка стиля elem.style.width="100px" работает так же, как наличие в атрибуте style строки width:100px.
+
+Для свойства из нескольких слов используется camelCase:
+
+background-color  => elem.style.backgroundColor
+z-index           => elem.style.zIndex
+border-left-width => elem.style.borderLeftWidth
+
+Например:
+
+document.body.style.backgroundColor = prompt('background color?', 'green');
+
+Свойства с префиксом
+Стили с браузерным префиксом, например, -moz-border-radius, -webkit-border-radius 
+преобразуются по тому же принципу: дефис означает заглавную букву.
+
+Например:
+
+button.style.MozBorderRadius = '5px';
+button.style.WebkitBorderRadius = '5px';
+--------------------
+
+Сброс стилей
+Иногда нам нужно добавить свойство стиля, а потом, позже, убрать его.
+
+elem.style.display = "none" - добавить свойство
+elem.style.display = "" - удалить свойство
+
+Если мы установим в style.display пустую строку, то браузер применит CSS-классы и 
+встроенные стили, как если бы такого свойства style.display вообще не было.
+--------------------
+
+style.cssText - Для задания нескольких стилей в одной строке используется
+--
+<div id="div">Button</div>
+
+<script>
+  // можем даже устанавливать специальные флаги для стилей, например, "important"
+  div.style.cssText=`color: red !important;
+    background-color: yellow;
+    width: 100px;
+    text-align: center;
+  `;
+
+  alert(div.style.cssText);
+</script>
+
+Это свойство удаляет все существующие стили: оно не добавляет, а заменяет их. 
+То же самое можно сделать установкой атрибута: div.setAttribute('style', 'color: red...').
+--------------------
+
+Вычисленные стили: getComputedStyle
+
+getComputedStyle(element, [pseudo]) - получить текущее значение свойств стилей
+
+element -Элемент, значения для которого нужно получить
+
+pseudo - Указывается, если нужен стиль псевдоэлемента, например ::before. getComputedStyle(elem, ['before'])
+
+getComputedStyle требует полное свойство! Например: paddingLeft, marginTop, borderTopWidth.
+Результат вызова – объект со стилями, похожий на elem.style, но с учётом всех CSS-классов.
+
+<head>
+  <style> body { color: red; margin: 5px } </style>
+</head>
+<body>
+
+  <script>
+    let computedStyle = getComputedStyle(document.body);
+
+    // сейчас мы можем прочитать отступ и цвет
+
+    alert( computedStyle.marginTop ); // 5px
+    alert( computedStyle.color ); // rgb(255, 0, 0)
+  </script>
+
+</body>
+
+getComputedStyle требует полное свойство! Например: paddingLeft, marginTop, borderTopWidth.
+
+--------------------
+
 ____________________________________________________________________________________________________________________________________
 ____________________________________________________________________________________________________________________________________
 -
