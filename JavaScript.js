@@ -6163,6 +6163,46 @@ https://learn.javascript.ru/modifying-document#neskolko-slov-o-document-write
   // вызов происходит после того, как страница загрузится, поэтому метод затирает содержимое
   setTimeout(() => document.write('<b>...Этим.</b>'), 1000);
 </script>
+--------------------Задачи-----
+let data = {
+    "Рыбы": {
+      "форель": {},
+      "лосось": {}
+    },
+
+    "Деревья": {
+      "Огромные": {
+        "секвойя": {},
+        "дуб": {}
+      },
+      "Цветковые": {
+        "яблоня": {},
+        "магнолия": {}
+      }
+    }
+  };
+
+function createTreeDom(obj) {
+
+    if(!Object.keys(obj).length) {
+        return
+    }
+    let ul = document.createElement('ul')
+
+    for(let key in obj) {
+
+        let li = document.createElement('li')
+        li.innerHTML = key
+        ul.append(li)
+        let childUl = createTreeDom(obj[key])
+        if(childUl) li.append(childUl)
+    }
+
+    container.append(ul)
+    return ul
+}
+
+createTreeDom(data)
 ____________________________________________________________________________________________________________________________________
 ____________________________________________________________________________________________________________________________________
 ____________________________________________________________________________________________________________________________________
