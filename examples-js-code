@@ -334,3 +334,42 @@ let sumNew = curry(sum)
 console.log(sumNew(2)(3)(3))
 console.log(sumNew(2,3)(3))
 console.log(sumNew(2,3,3))
+---
+function sum(a,b,c) {
+  console.log(a + b + c)
+}
+
+function carrSum(func){
+  return function f(...args) {
+    if(args.length < func.length) {
+      console.log("if", args)
+      return f.bind(null, ...args)
+    }else {
+      console.log("else")
+      func.apply(this, args)
+    }
+  }
+}
+
+let carr = carrSum(sum);
+carr(1)(2)(3)
+
+---------------------random min max-------------------
+
+function getRandomNum(min, max){
+  let random = min + Math.floor(Math.random() * (max - min + 1) )
+  return random
+  }
+
+let i =0;
+let obj = {}
+
+while(i < 99) {
+  i++
+  currentNum = getRandomNum(2,4);
+  obj[currentNum] = obj[currentNum] ? (obj[currentNum] += 1) : 1;
+}
+
+console.log(obj)
+
+
